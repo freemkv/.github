@@ -31,34 +31,35 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 ## Quick Start
 
 ```bash
-# Install
 wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.1/freemkv-v0.1.1-x86_64-unknown-linux-gnu.tar.gz | tar xz
-sudo mv freemkv /usr/local/bin/
-
-# Check your drive
-sudo freemkv info
+./freemkv info
 ```
 
 ```
+freemkv 0.1.1
+
 Drive Information
-  Device:              /dev/sr0
-  Vendor:              HL-DT-ST
+  Device:              /dev/sg4
+  Manufacturer:        HL-DT-ST
   Product:             BD-RE BU40N
   Revision:            1.03
-  Firmware type:       NM00000
+  Serial number:       MO6J7HB1010
   Firmware date:       2018-10-24
+  Bus encryption:      17
 
-Profile Match
-  Chipset:             MediaTek MT1959
-  Status:              Matched (ready to unlock)
+Platform Information
+  Drive platform:      MTK MT1959
+  Firmware version:    1.03/NM00000
+
+Run 'freemkv info --share' to share your profile and help expand drive support.
 ```
 
 ```bash
-# Share your drive profile (helps expand hardware support)
-sudo freemkv info --share
+# Share your drive profile
+./freemkv info --share
 
 # Back up a disc (coming soon)
-sudo freemkv rip --output ~/backups/
+./freemkv rip --output ~/backups/
 ```
 
 ---
