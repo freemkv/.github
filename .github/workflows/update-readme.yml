@@ -16,10 +16,12 @@ jobs:
       - name: Update version in README
         run: |
           VERSION="${{ github.event.client_payload.version }}"
+          DATE="$(date -u '+%Y-%m-%d')"
           FILE="profile/README.md"
 
-          # Update "Latest: vX.Y.Z"
-          sed -i "s|^\*\*Latest: v[0-9]*\.[0-9]*\.[0-9]*\*\*|**Latest: ${VERSION}**|" "$FILE"
+          # Update "Latest: vX.Y.Z (YYYY-MM-DD)"
+          sed -i "s|^\*\*Latest: v[0-9]*\.[0-9]*\.[0-9]*.*(.*)\*\*|**Latest: ${VERSION} (${DATE})**|" "$FILE"
+          sed -i "s|^\*\*Latest: v[0-9]*\.[0-9]*\.[0-9]*\*\*|**Latest: ${VERSION} (${DATE})**|" "$FILE"
 
           # Update all download URLs containing old version
           sed -i "s|freemkv-v[0-9]*\.[0-9]*\.[0-9]*|freemkv-${VERSION}|g" "$FILE"
@@ -27,6 +29,7 @@ jobs:
 
       - name: Commit and push
         run: |
+          VERSION="${{ github.event.client_payload.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add profile/README.md
