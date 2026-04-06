@@ -13,13 +13,18 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ---
 
-## Download — v0.1.0
+## Download
 
-> **[Download v0.1.0](https://github.com/freemkv/freemkv/releases/tag/v0.1.0)** — Linux x86_64 and aarch64 binaries.
->
-> macOS and Windows coming soon. [All releases](https://github.com/freemkv/freemkv/releases).
+**Latest: v0.1.0**
 
-Or build from source: `cargo install freemkv`
+| Platform | | |
+|----------|-|---|
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.0/freemkv-v0.1.0-x86_64-unknown-linux-gnu.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.0/freemkv-v0.1.0-aarch64-unknown-linux-gnu.tar.gz) | Raspberry Pi, ARM servers |
+| macOS | Coming soon | |
+| Windows | Coming soon | |
+
+[Older versions](https://github.com/freemkv/freemkv/releases) · Build from source: `cargo install freemkv`
 
 ---
 
