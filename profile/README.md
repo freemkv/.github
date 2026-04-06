@@ -15,7 +15,7 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ## Download
 
-**Latest: v0.1.3**
+**Latest: v0.1.3 (2026-04-06)**
 
 | Platform | | |
 |----------|-|---|
@@ -36,7 +36,7 @@ wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.3/freemkv-v0
 ```
 
 ```
-freemkv 0.1.1
+freemkv 0.1.3
 
 Drive Information
   Device:              /dev/sg4
