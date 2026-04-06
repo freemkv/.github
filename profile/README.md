@@ -19,8 +19,8 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 | Platform | | |
 |----------|-|---|
-| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.5/freemkv-v0.1.5-x86_64-unknown-linux-gnu.tar.gz) | Most desktops and servers |
-| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.5/freemkv-v0.1.5-aarch64-unknown-linux-gnu.tar.gz) | Raspberry Pi, ARM servers |
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.5/freemkv-v0.1.5-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.5/freemkv-v0.1.5-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
 | macOS | Coming soon | |
 | Windows | Coming soon | |
 
@@ -31,7 +31,7 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 ## Quick Start
 
 ```bash
-wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.5/freemkv-v0.1.5-x86_64-unknown-linux-gnu.tar.gz | tar xz
+wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.5/freemkv-v0.1.5-x86_64-unknown-linux-musl.tar.gz | tar xz
 ./freemkv info
 ```
 
