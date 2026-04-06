@@ -15,11 +15,11 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ## Quick Start
 
+**Download prebuilt binaries** from [Releases](https://github.com/freemkv/libfreemkv/releases/latest) — or build from source:
+
 ```bash
-# Download (or build from source)
 cargo install freemkv
 
-# Check your drive
 sudo freemkv info
 ```
 
