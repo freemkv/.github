@@ -8,23 +8,23 @@
 
 | Project | Description | Status |
 |---------|-------------|--------|
-| **[freemkv](https://github.com/freemkv/freemkv)** | 4K UHD / Blu-ray / DVD backup tool | v0.1.0 |
-| **[libfreemkv](https://github.com/freemkv/libfreemkv)** | 4K UHD / Blu-ray / DVD drive library | In development |
-| **[bdemu](https://github.com/freemkv/bdemu)** | 4K UHD / Blu-ray / DVD drive emulator | v0.1.0 |
-| **autorip** | 4K UHD / Blu-ray / DVD web automation | Planned |
+| **[freemkv](https://github.com/freemkv/freemkv)** | Disc backup CLI | v0.1.0 |
+| **[libfreemkv](https://github.com/freemkv/libfreemkv)** | Drive library | In development |
+| **[bdemu](https://github.com/freemkv/bdemu)** | Drive emulator | v0.1.0 |
+| **autorip** | Web automation | Planned |
 
 ### What is this?
 
 Open source tools for working with 4K UHD, Blu-ray, DVD, and CD optical drives on Linux. Built in Rust.
 
-- **freemkv** — CLI tool for backing up your 4K UHD / Blu-ray / DVD disc collection. Includes `freemkv info` for drive identification and community profile sharing.
-- **libfreemkv** — Low-level 4K UHD / Blu-ray / DVD drive library. Handles SCSI commands, drive identification, and raw disc access.
-- **bdemu** — 4K UHD / Blu-ray / DVD drive emulator. Emulates drives from captured hardware profiles for development and testing without real hardware.
-- **autorip** — Web interface for automated 4K UHD / Blu-ray / DVD disc processing.
+- **freemkv** — Back up your disc collection from the command line. Includes `freemkv info` for drive identification and community profile sharing.
+- **libfreemkv** — Low-level drive library. SCSI commands, drive identification, raw disc access.
+- **bdemu** — Drive emulator. Test and develop without real hardware using captured drive profiles.
+- **autorip** — Web interface for automated disc processing.
 
 ### Contributing
 
-Run `freemkv info --share` to submit your drive's profile and help expand hardware support. Profiles are automatically processed via GitHub Actions.
+Run `freemkv info --share` to submit your drive's profile and help expand hardware support.
 
 ### License
 
