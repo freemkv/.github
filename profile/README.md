@@ -15,12 +15,12 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ## Download
 
-**Latest: v0.1.0**
+**Latest: v0.1.1**
 
 | Platform | | |
 |----------|-|---|
-| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.0/freemkv-v0.1.0-x86_64-unknown-linux-gnu.tar.gz) | Most desktops and servers |
-| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.0/freemkv-v0.1.0-aarch64-unknown-linux-gnu.tar.gz) | Raspberry Pi, ARM servers |
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.1/freemkv-v0.1.1-x86_64-unknown-linux-gnu.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.1/freemkv-v0.1.1-aarch64-unknown-linux-gnu.tar.gz) | Raspberry Pi, ARM servers |
 | macOS | Coming soon | |
 | Windows | Coming soon | |
 
@@ -32,7 +32,7 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ```bash
 # Install
-wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.0/freemkv-v0.1.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
+wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.1/freemkv-v0.1.1-x86_64-unknown-linux-gnu.tar.gz | tar xz
 sudo mv freemkv /usr/local/bin/
 
 # Check your drive
