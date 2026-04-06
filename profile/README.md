@@ -31,6 +31,11 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 ## Quick Start
 
 ```bash
+# Install
+wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.0/freemkv-v0.1.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
+sudo mv freemkv /usr/local/bin/
+
+# Check your drive
 sudo freemkv info
 ```
 
