@@ -15,12 +15,12 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ## Download
 
-**Latest: v0.1.2**
+**Latest: v0.1.3**
 
 | Platform | | |
 |----------|-|---|
-| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.2/freemkv-v0.1.2-x86_64-unknown-linux-gnu.tar.gz) | Most desktops and servers |
-| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.2/freemkv-v0.1.2-aarch64-unknown-linux-gnu.tar.gz) | Raspberry Pi, ARM servers |
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.3/freemkv-v0.1.3-x86_64-unknown-linux-gnu.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.1.3/freemkv-v0.1.3-aarch64-unknown-linux-gnu.tar.gz) | Raspberry Pi, ARM servers |
 | macOS | Coming soon | |
 | Windows | Coming soon | |
 
@@ -31,7 +31,7 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 ## Quick Start
 
 ```bash
-wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.2/freemkv-v0.1.2-x86_64-unknown-linux-gnu.tar.gz | tar xz
+wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.3/freemkv-v0.1.3-x86_64-unknown-linux-gnu.tar.gz | tar xz
 ./freemkv info
 ```
 
