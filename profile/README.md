@@ -13,13 +13,21 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 
 ---
 
+## Download
+
+[![Latest Release](https://img.shields.io/github/v/release/freemkv/freemkv?label=latest&color=brightgreen)](https://github.com/freemkv/freemkv/releases/latest)
+
+> **[Download latest release](https://github.com/freemkv/freemkv/releases/latest)** — Linux x86_64 and aarch64 binaries.
+>
+> macOS and Windows coming soon. [All releases](https://github.com/freemkv/freemkv/releases).
+
+Or build from source: `cargo install freemkv`
+
+---
+
 ## Quick Start
 
-**Download prebuilt binaries** from [Releases](https://github.com/freemkv/libfreemkv/releases/latest) — or build from source:
-
 ```bash
-cargo install freemkv
-
 sudo freemkv info
 ```
 
