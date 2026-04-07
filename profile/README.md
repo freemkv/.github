@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/drives-206-brightgreen" alt="206 supported drives">
+  <img src="https://img.shields.io/github/v/release/freemkv/freemkv?label=latest&color=brightgreen" alt="Latest release">
   <img src="https://img.shields.io/badge/rust-stable-orange" alt="Rust">
   <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="AGPL-3.0">
   <img src="https://img.shields.io/badge/platform-Linux-lightgrey" alt="Linux">
@@ -7,9 +7,9 @@
 
 # freemkv
 
-Open source tools for backing up 4K UHD, Blu-ray, and DVD discs. Built in Rust.
+Open source tools for backing up 4K UHD and Blu-ray discs. Built in Rust.
 
-No proprietary fingerprints. No encrypted lookups. Drive identification uses standard SCSI commands (SPC-4 INQUIRY + MMC-6 GET CONFIGURATION) and all 206 drive profiles are bundled into the binary. Plug in your drive and go.
+Drive profiles are bundled. AACS decryption is built-in and transparent. Plug in your drive and go.
 
 ---
 
@@ -24,120 +24,81 @@ No proprietary fingerprints. No encrypted lookups. Drive identification uses sta
 | macOS | Coming soon | |
 | Windows | Coming soon | |
 
-[Older versions](https://github.com/freemkv/freemkv/releases) · Build from source: `cargo install freemkv`
+[All releases](https://github.com/freemkv/freemkv/releases) · Build from source: `cargo install freemkv`
 
 ---
 
 ## Quick Start
 
 ```bash
-wget -qO- https://github.com/freemkv/freemkv/releases/download/v0.1.8/freemkv-v0.1.8-x86_64-unknown-linux-musl.tar.gz | tar xz
-./freemkv info
+./freemkv drive-info
 ```
 
 ```
-freemkv 0.1.3
+freemkv 0.2.0
 
 Drive Information
   Device:              /dev/sg4
   Manufacturer:        HL-DT-ST
   Product:             BD-RE BU40N
   Revision:            1.03
-  Serial number:       MO6J7HB1010
   Firmware date:       2018-10-24
-  Bus encryption:      17
 
 Platform Information
   Drive platform:      MTK MT1959
   Firmware version:    1.03/NM00000
 
-Run 'freemkv info --share' to share your profile and help expand drive support.
+Run 'freemkv drive-info --share' to help expand drive support.
 ```
 
 ```bash
-# Share your drive profile
-./freemkv info --share
+# Show disc contents
+./freemkv disc-info
 
-# Back up a disc (coming soon)
+# Back up a disc
 ./freemkv rip --output ~/backups/
+
+# Share your drive profile
+./freemkv drive-info --share
 ```
 
 ---
 
 ## Repositories
 
-| | Repository | What it does |
-|-|------------|--------------|
-| | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — identify drives, share profiles, back up discs |
-| | [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI transport, drive identification, raw sector reads. [crates.io](https://crates.io/crates/libfreemkv) |
-| | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — test without hardware using `LD_PRELOAD` SCSI interception |
-
----
-
-## Supported Hardware
-
-**206 optical drives** across the MediaTek MT1959 chipset. Covers most LG, ASUS, and HP Blu-ray drives from the last decade.
-
-| Chipset | Status | Drives | Brands |
-|---------|--------|--------|--------|
-| MediaTek MT1959 | Supported | 206 | LG, ASUS, HP |
-| Renesas | Planned | -- | Pioneer |
-
-Don't see your drive? Run `freemkv info --share` to submit your profile. Expanding hardware support is our top priority.
+| Repository | What it does |
+|------------|--------------|
+| [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — drive info, disc scanning, disc backup |
+| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, MPLS, CLPI, AACS. [crates.io](https://crates.io/crates/libfreemkv) · [docs](https://github.com/freemkv/libfreemkv/tree/main/docs) |
+| [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without hardware |
 
 ---
 
 ## How It Works
 
-1. **Identify** — SCSI INQUIRY reads the drive's vendor, product, revision, and firmware type. GET CONFIGURATION 010C reads the firmware date. These five fields uniquely identify a drive.
+Identify drive → match profile → unlock → scan disc → decrypt AACS → read content.
 
-2. **Match** — The identity is matched against 206 bundled profiles. Each profile contains the exact SCSI READ BUFFER parameters for that drive's chipset (mode byte, buffer ID, expected response signature).
-
-3. **Unlock** — A single READ BUFFER command activates raw read mode. The drive confirms with a 4-byte signature. No flashing, no persistent changes to the drive.
-
-4. **Read** — Standard READ(10) with the raw flag reads unprocessed sectors directly from disc. Speed calibration optimizes throughput per disc region.
+See the [full technical documentation](https://github.com/freemkv/libfreemkv/tree/main/docs), starting with the [end-to-end flow](https://github.com/freemkv/libfreemkv/blob/main/docs/disc-to-rip.md).
 
 ---
 
-## Platform Support
+## Hardware
 
-| Platform | freemkv CLI | libfreemkv | bdemu |
-|----------|-------------|------------|-------|
-| Linux | Supported | Supported (SG_IO) | Supported (LD_PRELOAD) |
-| macOS | Planned | Planned (IOKit) | Planned |
-| Windows | Planned | Planned (SPTI) | N/A |
+Supports MediaTek MT1959 drives (LG, ASUS, HP). Pioneer/Renesas planned.
 
-The SCSI transport layer is behind a trait — adding macOS and Windows backends is straightforward. Linux is fully working today.
+Run `freemkv drive-info --share` to submit your drive's profile and help expand support.
 
 ---
 
-## For Developers
+## Platform
 
-bdemu lets you develop and test without a physical drive. It intercepts SCSI commands via `LD_PRELOAD` and emulates a complete optical drive from captured hardware profiles.
-
-```bash
-# Build the emulator
-cd bdemu && cargo build --release
-
-# Emulate a BU40N with a disc loaded
-BDEMU_PROFILE=profiles/bu40n BDEMU_DISC=test_disc \
-  LD_PRELOAD=target/release/libbdemu.so \
-  freemkv info
-```
-
-Create your own disc profiles from real hardware:
-
-```bash
-bdemu capture-disc /dev/sr0 profiles/my-drive/discs/my-disc/
-```
+Linux today. macOS and Windows planned. The SCSI transport is behind a trait — adding platforms is straightforward.
 
 ---
 
 ## Contributing
 
-The fastest way to help: run `freemkv info --share` and submit your drive's profile. Every new profile expands hardware support for everyone.
-
-Code contributions welcome. See individual repo CONTRIBUTING.md files.
+Run `freemkv drive-info --share` to submit your drive profile. Code contributions welcome.
 
 ---
 
