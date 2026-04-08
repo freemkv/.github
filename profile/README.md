@@ -15,14 +15,14 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Plug in
 
 ## Download
 
-**Latest: v0.3.0 (2026-04-08)**
+**Latest: v0.3.1 (2026-04-08)**
 
 | Platform | | |
 |----------|-|---|
-| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.0/freemkv-v0.3.0-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
-| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.0/freemkv-v0.3.0-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
-| macOS (Apple Silicon) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.0/freemkv-v0.3.0-aarch64-apple-darwin.tar.gz) | M1/M2/M3/M4 Macs |
-| macOS (Intel) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.0/freemkv-v0.3.0-x86_64-apple-darwin.tar.gz) | Older Intel Macs |
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
+| macOS (Apple Silicon) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-aarch64-apple-darwin.tar.gz) | M1/M2/M3/M4 Macs |
+| macOS (Intel) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-x86_64-apple-darwin.tar.gz) | Older Intel Macs |
 | Windows | Coming soon | |
 
 [All releases](https://github.com/freemkv/freemkv/releases) · Build from source: `cargo install freemkv`
@@ -33,7 +33,7 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Plug in
 
 ```bash
 # Download and extract (Linux x86_64)
-wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.3.0-x86_64-unknown-linux-musl.tar.gz | tar xz
+wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.3.1-x86_64-unknown-linux-musl.tar.gz | tar xz
 ```
 
 ```bash
