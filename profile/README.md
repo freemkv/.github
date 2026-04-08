@@ -9,7 +9,7 @@
 
 Open source tools for backing up 4K UHD and Blu-ray discs. Built in Rust.
 
-Drive profiles are bundled. AACS decryption is built-in and transparent. Plug in your drive and go.
+Drive profiles are bundled. AACS decryption is built-in and transparent. Stream labels are extracted automatically. Multi-lingual — the library outputs structured data, not English text. Plug in your drive and go.
 
 ---
 
@@ -42,7 +42,7 @@ wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0
 ```
 
 ```
-freemkv 0.2.0
+freemkv 0.3.1
 
 Drive Information
   Device:              /dev/sg4
@@ -52,45 +52,60 @@ Drive Information
   Firmware date:       2018-10-24
 
 Platform Information
-  Drive platform:      MTK MT1959
+  Drive platform:      MediaTek
   Firmware version:    1.03/NM00000
 
 Run 'freemkv drive-info --share' to help expand drive support.
 ```
 
 ```bash
-# See what's on the disc — titles, audio tracks, subtitles, HDR format
+# See what's on the disc — titles, audio, subtitles, HDR, stream labels
 ./freemkv disc-info
 ```
 
 ```
-freemkv 0.2.0
+freemkv 0.3.1
 
-Disc Information
-  Volume ID:           DUNE_PART_TWO_4KUHD
-  AACS:                Encrypted (keys found)
-  Playlists:           18
+Scanning disc...
+
+Disc: Dune: Part Two
+Format: 4K UHD (2L, 78.8 GB)
+AACS: Encrypted
 
 Titles
-  #0   2:46:29   48.2 GB   Main feature
-       Video:    HEVC 3840x2160 HDR10 23.976fps
-       Audio:    TrueHD Atmos 7.1 (English)
-       Audio:    AC-3 5.1 (French)
-       Audio:    AC-3 5.1 (Spanish)
-       Subtitle: PGS (English)
-       Subtitle: PGS (French)
-       Subtitle: PGS (Spanish)
-  #1   0:05:12   1.8 GB    Behind the scenes
-  #2   0:02:44   0.9 GB    Trailer
+
+   1. 00800.mpls      2h 45m   72.0 GB  1 clip
+
+      Video:     HEVC 2160p HDR10 BT.2020
+                 HEVC 1080p Dolby Vision BT.2020 Dolby Vision EL
+
+      Audio:     English TrueHD 5.1 (TrueHD)
+                 English DD 5.1 (Dolby Digital)
+                 English DD 5.1 (Descriptive Audio (US))
+                 English DD 5.1 (Descriptive Audio (UK))
+                 French DD 5.1
+                 Spanish DD 5.1
+
+      Subtitle:  English (forced)
+                 French (forced)
+                 Spanish
 ```
 
-```bash
-# Back up the main title
-./freemkv rip --output ~/Movies/
+Labels like `TrueHD`, `Descriptive Audio`, and `forced` are extracted from BD-J disc files — data that standard tools can't see.
 
-# Share your drive profile to help expand support
-./freemkv drive-info --share --mask
-```
+---
+
+## Stream Labels
+
+freemkv reads BD-J authoring files to extract rich stream metadata beyond what MPLS provides:
+
+- **Audio purpose** — Commentary, Descriptive Audio, Score
+- **Codec detail** — TrueHD, Dolby Digital, Dolby Atmos
+- **Forced subtitles** — which tracks are forced/narrative
+- **Language variants** — US vs UK English, Castilian vs Latin Spanish
+- **SDH** — subtitles for deaf/hard of hearing
+
+Five format parsers built in (Paramount, Criterion, Pixelogic, Warner CTRM, Deluxe). Automatic detection.
 
 ---
 
@@ -99,45 +114,37 @@ Titles
 | Repository | What it does |
 |------------|--------------|
 | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — drive info, disc scanning, disc backup |
-| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, MPLS, CLPI, AACS. [crates.io](https://crates.io/crates/libfreemkv) · [docs](https://github.com/freemkv/libfreemkv/tree/main/docs) |
+| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, AACS 1.0 + 2.0, stream labels. [crates.io](https://crates.io/crates/libfreemkv) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without hardware |
 
 ---
 
 ## How It Works
 
-1. **Identify** — reads your drive's INQUIRY and GET_CONFIG responses
-2. **Match** — finds the right profile from the bundled database
-3. **Unlock** — sends the vendor-specific SCSI command to enable raw reads
-4. **Scan** — parses UDF filesystem, playlists (MPLS), clip info (CLPI), BD-J labels
-5. **Decrypt** — resolves AACS keys from KEYDB and decrypts content transparently
-6. **Read** — streams decrypted sectors to output files
-
-See the [full technical documentation](https://github.com/freemkv/libfreemkv/tree/main/docs), starting with the [end-to-end flow](https://github.com/freemkv/libfreemkv/blob/main/docs/disc-to-rip.md).
+1. **Identify** — reads drive INQUIRY and GET_CONFIG
+2. **Match** — finds the right unlock profile from the bundled database
+3. **Unlock** — vendor-specific SCSI command to enable raw reads
+4. **Scan** — UDF filesystem, playlists, clip info, BD-J stream labels
+5. **Decrypt** — AACS 1.0/2.0 key resolution + transparent decryption
+6. **Read** — streams decrypted content to output
 
 ---
 
 ## Hardware
 
-Supports MediaTek MT1959 drives (LG, ASUS, HP). Pioneer/Renesas planned.
+Supports MediaTek MT1959 drives (LG, ASUS, HP). Pioneer support planned.
 
-Run `freemkv drive-info --share` to submit your drive's profile and help expand support.
+Run `freemkv drive-info --share` to submit your drive profile.
 
 ---
 
 ## Platform
 
-| Platform | Status | Backend |
-|----------|--------|---------|
-| Linux | Supported | SG_IO ioctl |
-| macOS | Supported | IOKit SCSITask |
-| Windows | Planned | SPTI |
-
----
-
-## Contributing
-
-Run `freemkv drive-info --share` to submit your drive profile. Code contributions welcome.
+| Platform | Status |
+|----------|--------|
+| Linux | Supported (SG_IO) |
+| macOS | Supported (IOKit) |
+| Windows | Planned (SPTI) |
 
 ---
 
