@@ -15,14 +15,14 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ## Download
 
-**Latest: v0.3.1 (2026-04-08)**
+**Latest: v0.5.0 (2026-04-09)**
 
 | Platform | | |
 |----------|-|---|
-| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
-| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
-| macOS (Apple Silicon) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-aarch64-apple-darwin.tar.gz) | M1/M2/M3/M4 Macs |
-| macOS (Intel) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.3.1/freemkv-v0.3.1-x86_64-apple-darwin.tar.gz) | Older Intel Macs |
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
+| macOS (Apple Silicon) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-aarch64-apple-darwin.tar.gz) | M1/M2/M3/M4 Macs |
+| macOS (Intel) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-x86_64-apple-darwin.tar.gz) | Older Intel Macs |
 | Windows | Coming soon | |
 
 [All releases](https://github.com/freemkv/freemkv/releases) · Build from source: `cargo install freemkv`
@@ -33,7 +33,7 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ```bash
 # Download and extract (Linux x86_64)
-wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.3.1-x86_64-unknown-linux-musl.tar.gz | tar xz
+wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.5.0-x86_64-unknown-linux-musl.tar.gz | tar xz
 ```
 
 ```bash
@@ -42,7 +42,7 @@ wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0
 ```
 
 ```
-freemkv 0.3.1
+freemkv 0.5.0
 
 Drive Information
   Device:              /dev/sg4
@@ -64,7 +64,7 @@ Run 'freemkv drive-info --share' to help expand drive support.
 ```
 
 ```
-freemkv 0.3.1
+freemkv 0.5.0
 
 Scanning disc...
 
@@ -92,6 +92,32 @@ Titles
 ```
 
 Labels like `TrueHD`, `Descriptive Audio`, and `forced` are extracted from BD-J disc files — data that standard tools can't see.
+
+```bash
+# Rip the main feature
+./freemkv rip --output ~/Movies/
+```
+
+```
+freemkv rip v0.5.0
+
+Opening /dev/sg4... OK
+  HL-DT-ST BD-RE BU40N
+Waiting for disc... OK
+Initializing drive... OK
+Probing disc... OK
+Scanning disc... OK
+
+  Capacity: 25.5 GB (13368800 sectors)
+  AACS:     encrypted (keys found)
+
+Ripping title 1 (2h 12m) -> ~/Movies/V For Vendetta_t01.m2ts
+  1 extent(s), 21.3 GB
+
+Complete: 21767 MB in 1142s
+Speed:    19.1 MB/s avg, 26.1 MB/s peak
+Output:   ~/Movies/V For Vendetta_t01.m2ts
+```
 
 ---
 
@@ -122,11 +148,11 @@ Five format parsers built in (Paramount, Criterion, Pixelogic, Warner CTRM, Delu
 ## How It Works
 
 1. **Identify** — reads drive INQUIRY and GET_CONFIG
-2. **Match** — finds the right unlock profile from the bundled database
-3. **Unlock** — vendor-specific SCSI command to enable raw reads
+2. **Match** — finds the right profile from 206 bundled drive profiles
+3. **Init** — uploads firmware, removes riplock, probes disc for optimal speeds
 4. **Scan** — UDF filesystem, playlists, clip info, BD-J stream labels
 5. **Decrypt** — AACS 1.0/2.0 key resolution + transparent decryption
-6. **Read** — streams decrypted content to output
+6. **Read** — adaptive batching, error recovery, 19+ MB/s sustained
 
 ---
 
