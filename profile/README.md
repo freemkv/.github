@@ -30,7 +30,7 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ## Download
 
-**Latest: v0.6.0 (2026-04-09)**
+**Latest: v0.6.0 (2026-04-10)**
 
 | Platform | | |
 |----------|-|---|
