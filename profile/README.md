@@ -13,6 +13,21 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ---
 
+## Features
+
+- **4K UHD + Blu-ray + DVD** — one tool for all optical disc formats
+- **MKV output** — direct rip to MKV with all streams, or raw m2ts
+- **AACS 1.0 + 2.0 decryption** — transparent key resolution, bus decryption, per-sector decrypt
+- **Stream labels** — 5 BD-J parsers extract audio/subtitle metadata other tools can't see
+- **Drive unlock + speed boost** — firmware upload removes riplock, 17+ MB/s sustained
+- **Works on any drive** — open and scan any optical drive, init adds features for supported drives
+- **Profile sharing** — `--share` captures and submits your drive profile to expand support
+- **Multi-lingual** — zero English in the library, all strings externalized in the CLI
+- **Single binary** — no dependencies, no Java, no external files
+- **Pure Rust** — library on [crates.io](https://crates.io/crates/libfreemkv), build any tool on top
+
+---
+
 ## Download
 
 **Latest: v0.6.0 (2026-04-09)**
