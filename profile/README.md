@@ -15,14 +15,14 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ## Download
 
-**Latest: v0.5.0 (2026-04-09)**
+**Latest: v0.6.0 (2026-04-09)**
 
 | Platform | | |
 |----------|-|---|
-| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
-| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
-| macOS (Apple Silicon) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-aarch64-apple-darwin.tar.gz) | M1/M2/M3/M4 Macs |
-| macOS (Intel) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.5.0/freemkv-v0.5.0-x86_64-apple-darwin.tar.gz) | Older Intel Macs |
+| Linux (Intel/AMD) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.6.0/freemkv-v0.6.0-x86_64-unknown-linux-musl.tar.gz) | Most desktops and servers |
+| Linux (ARM) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.6.0/freemkv-v0.6.0-aarch64-unknown-linux-musl.tar.gz) | Raspberry Pi, ARM servers |
+| macOS (Apple Silicon) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.6.0/freemkv-v0.6.0-aarch64-apple-darwin.tar.gz) | M1/M2/M3/M4 Macs |
+| macOS (Intel) | [**Download**](https://github.com/freemkv/freemkv/releases/download/v0.6.0/freemkv-v0.6.0-x86_64-apple-darwin.tar.gz) | Older Intel Macs |
 | Windows | Coming soon | |
 
 [All releases](https://github.com/freemkv/freemkv/releases) · Build from source: `cargo install freemkv`
@@ -33,7 +33,7 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ```bash
 # Download and extract (Linux x86_64)
-wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.5.0-x86_64-unknown-linux-musl.tar.gz | tar xz
+wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.6.0-x86_64-unknown-linux-musl.tar.gz | tar xz
 ```
 
 ```bash
@@ -42,18 +42,20 @@ wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0
 ```
 
 ```
-freemkv 0.5.0
+freemkv 0.6.0
 
 Drive Information
   Device:              /dev/sg4
   Manufacturer:        HL-DT-ST
   Product:             BD-RE BU40N
   Revision:            1.03
+  Serial number:       MO6J7HB1010
   Firmware date:       2018-10-24
 
 Platform Information
-  Drive platform:      MediaTek
+  Drive platform:      MediaTek MT1959
   Firmware version:    1.03/NM00000
+  Profile:             Supported
 
 Run 'freemkv drive-info --share' to help expand drive support.
 ```
@@ -64,7 +66,7 @@ Run 'freemkv drive-info --share' to help expand drive support.
 ```
 
 ```
-freemkv 0.5.0
+freemkv 0.6.0
 
 Scanning disc...
 
@@ -99,7 +101,7 @@ Labels like `TrueHD`, `Descriptive Audio`, and `forced` are extracted from BD-J 
 ```
 
 ```
-freemkv rip v0.5.0
+freemkv rip v0.6.0
 
 Opening /dev/sg4... OK
   HL-DT-ST BD-RE BU40N
@@ -108,15 +110,11 @@ Initializing drive... OK
 Probing disc... OK
 Scanning disc... OK
 
-  Capacity: 25.5 GB (13368800 sectors)
+  Capacity: 90.7 GB
   AACS:     encrypted (keys found)
 
-Ripping title 1 (2h 12m) -> ~/Movies/V For Vendetta_t01.m2ts
-  1 extent(s), 21.3 GB
-
-Complete: 21767 MB in 1142s
-Speed:    19.1 MB/s avg, 26.1 MB/s peak
-Output:   ~/Movies/V For Vendetta_t01.m2ts
+Ripping title 1 (2h 35m, 88.8 GB) -> Dune.mkv
+  22.1 GB / 88.8 GB  (25%)  17.2 MB/s  ETA 65:23
 ```
 
 ---
@@ -140,7 +138,7 @@ Five format parsers built in (Paramount, Criterion, Pixelogic, Warner CTRM, Delu
 | Repository | What it does |
 |------------|--------------|
 | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — drive info, disc scanning, disc backup |
-| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, AACS 1.0 + 2.0, stream labels. [crates.io](https://crates.io/crates/libfreemkv) |
+| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, AACS 1.0 + 2.0, MKV muxer, stream labels. [crates.io](https://crates.io/crates/libfreemkv) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without hardware |
 
 ---
