@@ -118,6 +118,7 @@ AACS: Encrypted
 |-|-|
 | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — all commands, flags, streaming examples |
 | [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — API, 7 stream types, architecture, error codes. [crates.io](https://crates.io/crates/libfreemkv) |
+| [**autorip**](https://github.com/freemkv/autorip) | Automatic ripper — insert disc, get MKV. Web UI, TMDB, webhooks. |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without real hardware |
 
 Supports LG, ASUS, HP, and other MediaTek-based BD-RE drives. Linux, macOS, and Windows. Pioneer planned.
