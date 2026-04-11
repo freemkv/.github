@@ -118,7 +118,17 @@ AACS: Encrypted
 
 Supports LG, ASUS, HP, and other MediaTek-based BD-RE drives. Linux and macOS. Pioneer and Windows planned.
 
-Run `freemkv info disc:// --share` to submit your drive profile and help expand support.
+### Help expand drive support
+
+freemkv ships with 206 drive profiles. If your drive isn't supported yet, one command captures everything we need:
+
+```bash
+freemkv info disc:// --share
+```
+
+This reads your drive's SCSI identity, firmware version, and hardware capabilities — then submits them as a GitHub issue. No disc data, no personal info, no keys. Just the hardware profile. One submission can unlock support for every drive with the same chipset.
+
+Use `--mask` to anonymize serial numbers before sharing.
 
 ---
 
