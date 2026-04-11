@@ -41,6 +41,10 @@ curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-aar
 curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-apple-darwin.tar.gz | tar xz
 ```
 
+**Windows:**
+
+Download [freemkv-x86_64-pc-windows-msvc.zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-pc-windows-msvc.zip), extract, and run from Command Prompt as administrator.
+
 **From source:**
 ```bash
 cargo install freemkv
@@ -116,7 +120,7 @@ AACS: Encrypted
 | [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — API, 7 stream types, architecture, error codes. [crates.io](https://crates.io/crates/libfreemkv) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without real hardware |
 
-Supports LG, ASUS, HP, and other MediaTek-based BD-RE drives. Linux and macOS. Pioneer and Windows planned.
+Supports LG, ASUS, HP, and other MediaTek-based BD-RE drives. Linux, macOS, and Windows. Pioneer planned.
 
 ### Help expand drive support
 
