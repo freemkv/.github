@@ -28,17 +28,17 @@ AACS decryption is built in and transparent. Stream labels are extracted automat
 
 **Linux:**
 ```bash
-curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.7.1-x86_64-unknown-linux-musl.tar.gz | tar xz
+curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-unknown-linux-musl.tar.gz | tar xz
 ```
 
 **macOS (Apple Silicon):**
 ```bash
-curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.7.1-aarch64-apple-darwin.tar.gz | tar xz
+curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-aarch64-apple-darwin.tar.gz | tar xz
 ```
 
 **macOS (Intel):**
 ```bash
-curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0.7.1-x86_64-apple-darwin.tar.gz | tar xz
+curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-apple-darwin.tar.gz | tar xz
 ```
 
 **From source:**
