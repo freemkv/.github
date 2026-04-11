@@ -9,18 +9,20 @@
 
 Open source tools for backing up 4K UHD and Blu-ray discs. Built in Rust.
 
-Drive profiles are bundled. AACS decryption is built-in and transparent. Stream labels are extracted automatically. Multi-lingual — the library outputs structured data, not English text. Plug in your drive and go.
+Two arguments — source and destination. Stream URLs let you rip, remux, and transfer between any combination of disc, file, and network. Drive profiles are bundled. AACS decryption is transparent. Stream labels are extracted automatically.
 
 ---
 
 ## Features
 
 - **4K UHD + Blu-ray + DVD** — one tool for all optical disc formats
+- **Stream architecture** — `freemkv <source> <dest>` with 7 stream types
 - **MKV output** — direct rip to MKV with all streams, or raw m2ts
 - **AACS 1.0 + 2.0 decryption** — transparent key resolution, bus decryption, per-sector decrypt
 - **Stream labels** — 5 BD-J parsers extract audio/subtitle metadata other tools can't see
 - **Drive unlock + speed boost** — firmware upload removes riplock, 17+ MB/s sustained
-- **Works on any drive** — open and scan any optical drive, init adds features for supported drives
+- **Network streaming** — rip on one machine, remux on another
+- **ISO image support** — read directly from Blu-ray ISO images
 - **Profile sharing** — `--share` captures and submits your drive profile to expand support
 - **Multi-lingual** — zero English in the library, all strings externalized in the CLI
 - **Single binary** — no dependencies, no Java, no external files
@@ -44,6 +46,48 @@ Drive profiles are bundled. AACS decryption is built-in and transparent. Stream 
 
 ---
 
+## Streams
+
+Every operation is `freemkv <source> <dest>`. Sources and destinations are stream URLs.
+
+| Stream | Input | Output | URL |
+|--------|-------|--------|-----|
+| Disc | Yes | -- | `disc://` or `disc:///dev/sg4` |
+| ISO | Yes | -- | `iso://image.iso` |
+| MKV | Yes | Yes | `mkv://path` |
+| M2TS | Yes | Yes | `m2ts://path` |
+| Network | Yes (listen) | Yes (connect) | `network://host:port` |
+| Stdio | Yes (stdin) | Yes (stdout) | `stdio://` |
+| Null | -- | Yes | `null://` |
+
+```bash
+# Rip disc to MKV
+freemkv disc:// mkv://Dune.mkv
+
+# Rip to raw transport stream
+freemkv disc:// m2ts://Dune.m2ts
+
+# Rip from ISO image
+freemkv iso://Dune.iso mkv://Dune.mkv
+
+# Remux between formats
+freemkv m2ts://Dune.m2ts mkv://Dune.mkv
+
+# Stream disc to network
+freemkv disc:// network://10.1.7.11:9000
+
+# Receive from network
+freemkv network://0.0.0.0:9000 mkv://Dune.mkv
+
+# Pipe to other tools
+freemkv disc:// stdio:// | ffmpeg -i pipe:0 -c copy output.mkv
+
+# Benchmark read speed
+freemkv disc:// null://
+```
+
+---
+
 ## Quick Start
 
 ```bash
@@ -52,39 +96,11 @@ wget -qO- https://github.com/freemkv/freemkv/releases/latest/download/freemkv-v0
 ```
 
 ```bash
-# See what drive you have
-./freemkv drive-info
+# See what's on the disc
+./freemkv info disc://
 ```
 
 ```
-freemkv 0.6.0
-
-Drive Information
-  Device:              /dev/sg4
-  Manufacturer:        HL-DT-ST
-  Product:             BD-RE BU40N
-  Revision:            1.03
-  Serial number:       MO6J7HB1010
-  Firmware date:       2018-10-24
-
-Platform Information
-  Drive platform:      MediaTek MT1959
-  Firmware version:    1.03/NM00000
-  Profile:             Supported
-
-Run 'freemkv drive-info --share' to help expand drive support.
-```
-
-```bash
-# See what's on the disc — titles, audio, subtitles, HDR, stream labels
-./freemkv disc-info
-```
-
-```
-freemkv 0.6.0
-
-Scanning disc...
-
 Disc: Dune: Part Two
 Format: 4K UHD (2L, 78.8 GB)
 AACS: Encrypted
@@ -111,14 +127,14 @@ Titles
 Labels like `TrueHD`, `Descriptive Audio`, and `forced` are extracted from BD-J disc files — data that standard tools can't see.
 
 ```bash
-# Rip the main feature
-./freemkv rip --output ~/Movies/
+# Rip to MKV
+./freemkv disc:// mkv://~/Movies/Dune.mkv
 ```
 
 ```
-freemkv rip v0.6.0
+freemkv 0.7.0
 
-Opening /dev/sg4... OK
+Opening disc://... OK
   HL-DT-ST BD-RE BU40N
 Waiting for disc... OK
 Initializing drive... OK
@@ -152,8 +168,8 @@ Five format parsers built in (Paramount, Criterion, Pixelogic, Warner CTRM, Delu
 
 | Repository | What it does |
 |------------|--------------|
-| [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — drive info, disc scanning, disc backup |
-| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, AACS 1.0 + 2.0, MKV muxer, stream labels. [crates.io](https://crates.io/crates/libfreemkv) |
+| [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — stream-based disc backup, remux, network streaming |
+| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — SCSI, UDF, AACS, 7 stream types, MKV muxer, stream labels. [crates.io](https://crates.io/crates/libfreemkv) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without hardware |
 
 ---
@@ -165,7 +181,7 @@ Five format parsers built in (Paramount, Criterion, Pixelogic, Warner CTRM, Delu
 3. **Init** — uploads firmware, removes riplock, probes disc for optimal speeds
 4. **Scan** — UDF filesystem, playlists, clip info, BD-J stream labels
 5. **Decrypt** — AACS 1.0/2.0 key resolution + transparent decryption
-6. **Read** — adaptive batching, error recovery, 19+ MB/s sustained
+6. **Stream** — pipe through any combination of disc, file, network, or stdio
 
 ---
 
@@ -173,7 +189,7 @@ Five format parsers built in (Paramount, Criterion, Pixelogic, Warner CTRM, Delu
 
 Supports MediaTek MT1959 drives (LG, ASUS, HP). Pioneer support planned.
 
-Run `freemkv drive-info --share` to submit your drive profile.
+Run `freemkv info disc:// --share` to submit your drive profile.
 
 ---
 
