@@ -2,69 +2,107 @@
   <img src="https://img.shields.io/github/v/release/freemkv/freemkv?label=latest&color=brightgreen" alt="Latest release">
   <img src="https://img.shields.io/crates/v/libfreemkv" alt="crates.io">
   <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="AGPL-3.0">
-  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS-lightgrey" alt="Linux | macOS">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey" alt="Linux | macOS | Windows">
 </p>
 
 # freemkv
 
-Open source 4K UHD / Blu-ray backup. One binary, no dependencies. Plug in your drive, rip to MKV.
+Open source 4K UHD / Blu-ray / DVD backup. One binary, no dependencies. Plug in your drive, rip to MKV.
 
-AACS decryption is built in and transparent. Stream labels are extracted automatically — audio purpose, codec detail, forced subtitles, language variants — metadata that other tools can't see. 206 drive profiles bundled. 17+ MB/s sustained.
-
----
-
-## Why freemkv
-
-- **It just works** — single binary, no Java, no external files, no setup
-- **It sees more** — 5 BD-J parsers extract stream labels other tools miss
-- **It's fast** — firmware upload removes riplock, adaptive batch sizing, 17+ MB/s
-- **It decrypts** — AACS 1.0 + 2.0, transparent, automatic
-- **It streams** — disc, file, ISO, network, stdin/stdout — any source to any destination
-- **It's open** — pure Rust, AGPL-3.0, library on [crates.io](https://crates.io/crates/libfreemkv)
+Stream labels extracted automatically — audio purpose, codec detail, forced subtitles, language variants — metadata other tools miss. Bundled drive profiles. 17+ MB/s sustained.
 
 ---
 
-## Install
+## Quick Start
+
+### 1. Install
 
 **Linux:**
 ```bash
 curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-unknown-linux-musl.tar.gz | tar xz
+sudo mv freemkv /usr/local/bin/
 ```
 
 **macOS (Apple Silicon):**
 ```bash
 curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-aarch64-apple-darwin.tar.gz | tar xz
+sudo mv freemkv /usr/local/bin/
 ```
 
 **macOS (Intel):**
 ```bash
 curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-apple-darwin.tar.gz | tar xz
+sudo mv freemkv /usr/local/bin/
 ```
 
-**Windows:**
+**Windows:** Download [freemkv-x86_64-pc-windows-msvc.zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-pc-windows-msvc.zip), extract, run from Command Prompt.
 
-Download [freemkv-x86_64-pc-windows-msvc.zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-pc-windows-msvc.zip), extract, and run from Command Prompt as administrator.
+**From source:** `cargo install freemkv`
 
-**From source:**
+[All downloads](https://github.com/freemkv/freemkv/releases)
+
+### 2. Set up decryption keys (one time)
+
+**DVD:** No setup needed. CSS decryption works out of the box.
+
+**Blu-ray / 4K UHD:** You need a KEYDB.cfg — a community-maintained AACS key database. freemkv cannot ship keys due to legal restrictions (same as every other BD ripping tool).
+
 ```bash
-cargo install freemkv
+freemkv update-keys --url <your-keydb-url>
 ```
 
-[All downloads](https://github.com/freemkv/freemkv/releases) (Linux x86/ARM, macOS Intel/Apple Silicon)
+Saved to `~/.config/freemkv/keydb.cfg` and used automatically from then on.
 
----
-
-## Use
-
-Two arguments — source and destination:
+### 3. Rip
 
 ```bash
-freemkv disc:// mkv://Dune.mkv
+freemkv disc:// mkv://Movie.mkv
 ```
 
 That's it. Scans the disc, decrypts, muxes to MKV with all streams and labels.
 
-### Streams
+---
+
+## Docker Autorip
+
+Insert a disc, walk away. Unattended ripping with a web dashboard.
+
+```bash
+docker pull ghcr.io/freemkv/autorip:latest
+```
+
+```yaml
+services:
+  autorip:
+    image: ghcr.io/freemkv/autorip:latest
+    devices:
+      - /dev/sr0:/dev/sr0
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config:/config
+      - /mnt/media:/output
+    environment:
+      - TMDB_API_KEY=your_key
+    privileged: true
+```
+
+Open `localhost:8080`. Configure KEYDB URL and TMDB key in Settings. Insert disc — it rips, looks up the title, organizes into `Movies/Title (Year)/Title.mkv`, ejects, waits for the next one.
+
+---
+
+## Why freemkv
+
+- **Open source** — pure Rust, AGPL-3.0, library on [crates.io](https://crates.io/crates/libfreemkv)
+- **It sees more** — BD-J parsers extract stream labels other tools miss
+- **It's fast** — firmware upload removes riplock, adaptive batch sizing, 17+ MB/s
+- **It decrypts** — AACS 1.0 + 2.0, CSS — all transparent and automatic
+- **It streams** — disc, file, ISO, network, stdin/stdout — any source to any destination
+- **It automates** — Docker container with web UI, TMDB, webhooks
+
+---
+
+## Streams
 
 | Stream | Input | Output | URL |
 |--------|-------|--------|-----|
@@ -89,57 +127,33 @@ freemkv disc:// stdio:// | ffmpeg -i pipe:0 ...     # Pipe to ffmpeg
 freemkv info disc://                                 # Show disc info
 ```
 
-### What it sees
-
-```
-Disc: Dune: Part Two
-Format: 4K UHD (2L, 78.8 GB)
-AACS: Encrypted
-
-   1. 00800.mpls      2h 45m   72.0 GB
-
-      Video:     HEVC 2160p HDR10 BT.2020
-                 HEVC 1080p Dolby Vision EL
-
-      Audio:     English TrueHD 5.1 (TrueHD)
-                 English DD 5.1 (Descriptive Audio (US))
-                 English DD 5.1 (Descriptive Audio (UK))
-                 French DD 5.1
-
-      Subtitle:  English (forced)
-                 French (forced)
-```
-
 ---
 
-## Details
+## Repos
 
 | | |
 |-|-|
 | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — all commands, flags, streaming examples |
 | [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — API, 7 stream types, architecture, error codes. [crates.io](https://crates.io/crates/libfreemkv) |
-| [**autorip**](https://github.com/freemkv/autorip) | Automatic ripper — insert disc, get MKV. Web UI, TMDB, webhooks. |
+| [**autorip**](https://github.com/freemkv/autorip) | Automatic ripper — Docker, web UI, TMDB, webhooks. [ghcr.io](https://ghcr.io/freemkv/autorip) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without real hardware |
 
 Supports LG, ASUS, HP, and other MediaTek-based BD-RE drives. Linux, macOS, and Windows. Pioneer planned.
 
 ### Help expand drive support
 
-freemkv ships with 206 drive profiles. If your drive isn't supported yet, one command captures everything we need:
-
 ```bash
 freemkv info disc:// --share
 ```
 
-This reads your drive's SCSI identity, firmware version, and hardware capabilities — then submits them as a GitHub issue. No disc data, no personal info, no keys. Just the hardware profile. One submission can unlock support for every drive with the same chipset.
-
-Use `--mask` to anonymize serial numbers before sharing.
+Captures your drive's hardware profile and submits it as a GitHub issue. No disc data, no personal info, no keys. Use `--mask` to anonymize serial numbers.
 
 ---
 
 <p align="center">
   <a href="https://github.com/freemkv/freemkv">CLI</a> ·
   <a href="https://github.com/freemkv/libfreemkv">Library</a> ·
+  <a href="https://github.com/freemkv/autorip">Autorip</a> ·
   <a href="https://github.com/freemkv/bdemu">Emulator</a> ·
   <a href="https://www.gnu.org/licenses/agpl-3.0.txt">AGPL-3.0</a>
 </p>
