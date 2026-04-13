@@ -1,37 +1,15 @@
-name: Update README version
+name: Release notification
 
 on:
   repository_dispatch:
     types: [new-release]
 
-permissions:
-  contents: write
-
 jobs:
-  update:
+  notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Update version in README
+      - name: Log release
         run: |
-          VERSION="${{ github.event.client_payload.version }}"
-          DATE="$(date -u '+%Y-%m-%d')"
-          FILE="profile/README.md"
-
-          # Update "Latest: vX.Y.Z (YYYY-MM-DD)"
-          sed -i "s|^\*\*Latest: v[0-9]*\.[0-9]*\.[0-9]*.*(.*)\*\*|**Latest: ${VERSION} (${DATE})**|" "$FILE"
-          sed -i "s|^\*\*Latest: v[0-9]*\.[0-9]*\.[0-9]*\*\*|**Latest: ${VERSION} (${DATE})**|" "$FILE"
-
-          # Update all download URLs containing old version
-          sed -i "s|freemkv-v[0-9]*\.[0-9]*\.[0-9]*|freemkv-${VERSION}|g" "$FILE"
-          sed -i "s|/download/v[0-9]*\.[0-9]*\.[0-9]*/|/download/${VERSION}/|g" "$FILE"
-
-      - name: Commit and push
-        run: |
-          VERSION="${{ github.event.client_payload.version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add profile/README.md
-          git diff --cached --quiet || git commit -m "Update to freemkv ${VERSION}"
-          git push
+          echo "New release: ${{ github.event.client_payload.version }}"
+          echo "Org homepage uses /latest/ URLs and shields.io badges — auto-updates."
+          echo "Review https://github.com/freemkv for accuracy after major releases."
