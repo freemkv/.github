@@ -107,7 +107,7 @@ Open `localhost:8080`. Configure KEYDB URL and TMDB key in Settings. Insert disc
 | Stream | Input | Output | URL |
 |--------|-------|--------|-----|
 | Disc | Yes | -- | `disc://` or `disc:///dev/sg4` |
-| ISO | Yes | -- | `iso://image.iso` |
+| ISO | Yes | Yes | `iso://image.iso` |
 | MKV | Yes | Yes | `mkv://path` |
 | M2TS | Yes | Yes | `m2ts://path` |
 | Network | Yes (listen) | Yes (connect) | `network://host:port` |
