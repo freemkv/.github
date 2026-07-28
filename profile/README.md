@@ -61,6 +61,10 @@ freemkv disc:// mkv://Movie.mkv
 
 That's it. Scans the disc, decrypts, muxes to MKV with all streams and labels.
 
+freemkv rips the **main title** by default. Add `-t all` to rip every title on the disc
+as separate files, or `-t N` to pick a specific one. Run `freemkv info disc://` to see all
+titles with durations.
+
 ---
 
 ## Docker Autorip
@@ -117,11 +121,12 @@ Open `localhost:8080`. Configure KEYDB URL and TMDB key in Settings. Insert disc
 ### Examples
 
 ```bash
-freemkv disc:// mkv://Dune.mkv                     # Rip to MKV
-freemkv disc:// m2ts://Dune.m2ts                    # Rip to transport stream
+freemkv disc:// mkv://Dune.mkv                     # Rip to MKV, main title (the default)
+freemkv disc:// m2ts://Dune.m2ts                   # Rip to transport stream, main title
+freemkv disc:// mkv://out/ -t all                  # Rip every title, one file each
 freemkv iso://Dune.iso mkv://Dune.mkv               # ISO to MKV
 freemkv m2ts://Dune.m2ts mkv://Dune.mkv             # Remux
-freemkv disc:// network://10.1.7.11:9000            # Stream over network
+freemkv disc:// network://192.0.2.11:9000            # Stream over network
 freemkv network://0.0.0.0:9000 mkv://Dune.mkv      # Receive from network
 freemkv disc:// stdio:// | ffmpeg -i pipe:0 ...     # Pipe to ffmpeg
 freemkv info disc://                                 # Show disc info
@@ -136,6 +141,7 @@ freemkv info disc://                                 # Show disc info
 | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — all commands, flags, streaming examples |
 | [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — API, 7 stream types, architecture, error codes. [crates.io](https://crates.io/crates/libfreemkv) |
 | [**autorip**](https://github.com/freemkv/autorip) | Automatic ripper — Docker, web UI, TMDB, webhooks. [ghcr.io](https://ghcr.io/freemkv/autorip) |
+| [**freemkv-engine**](https://github.com/freemkv/freemkv-engine) | Shared rip-orchestration layer between libfreemkv and the front ends (recovery strategy, multi-title rip loop) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without real hardware |
 
 Supports LG, ASUS, HP, and other MediaTek-based BD-RE drives. Linux, macOS, and Windows. Pioneer planned.
