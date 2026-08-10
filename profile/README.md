@@ -1,7 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/github/v/release/freemkv/freemkv?label=latest&color=brightgreen" alt="Latest release">
-  <img src="https://img.shields.io/crates/v/libfreemkv" alt="crates.io">
-  <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="AGPL-3.0">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT">
   <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey" alt="Linux | macOS | Windows">
 </p>
 
@@ -17,27 +16,28 @@ Stream labels extracted automatically — audio purpose, codec detail, forced su
 
 ### 1. Install
 
+**macOS — Homebrew:**
+```bash
+brew install freemkv/tap/freemkv          # command line
+brew install --cask freemkv/tap/freemkv   # desktop app
+```
+
 **Linux:**
 ```bash
-curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-unknown-linux-musl.tar.gz | tar xz
-sudo mv freemkv /usr/local/bin/
+curl -sLo freemkv https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-linux
+chmod +x freemkv && sudo mv freemkv /usr/local/bin/
 ```
+Use `freemkv-aarch64-linux` on arm64.
 
-**macOS (Apple Silicon):**
+**macOS — direct download:**
 ```bash
-curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-aarch64-apple-darwin.tar.gz | tar xz
-sudo mv freemkv /usr/local/bin/
+curl -sLo freemkv https://github.com/freemkv/freemkv/releases/latest/download/freemkv-aarch64-macos
+chmod +x freemkv && sudo mv freemkv /usr/local/bin/
 ```
+Use `freemkv-x86_64-macos` on Intel. Fetching with `curl` avoids the macOS
+security prompt a browser download gets; Homebrew does too.
 
-**macOS (Intel):**
-```bash
-curl -sL https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-apple-darwin.tar.gz | tar xz
-sudo mv freemkv /usr/local/bin/
-```
-
-**Windows:** Download [freemkv-x86_64-pc-windows-msvc.zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-pc-windows-msvc.zip), extract, run from Command Prompt.
-
-**From source:** `cargo install freemkv`
+**Windows:** Download [freemkv-x86_64-windows.zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-windows.zip), extract, run from Command Prompt.
 
 [All downloads](https://github.com/freemkv/freemkv/releases)
 
@@ -97,7 +97,7 @@ Open `localhost:8080`. Configure KEYDB URL and TMDB key in Settings. Insert disc
 
 ## Why freemkv
 
-- **Open source** — pure Rust, AGPL-3.0, library on [crates.io](https://crates.io/crates/libfreemkv)
+- **Open source** — pure Rust, MIT licensed
 - **It sees more** — BD-J parsers extract stream labels other tools miss
 - **It's fast** — firmware upload removes riplock, adaptive batch sizing, 17+ MB/s
 - **It decrypts** — AACS 1.0 + 2.0, CSS — all transparent and automatic
@@ -139,7 +139,7 @@ freemkv info disc://                                 # Show disc info
 | | |
 |-|-|
 | [**freemkv**](https://github.com/freemkv/freemkv) | CLI tool — all commands, flags, streaming examples |
-| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — API, 7 stream types, architecture, error codes. [crates.io](https://crates.io/crates/libfreemkv) |
+| [**libfreemkv**](https://github.com/freemkv/libfreemkv) | Rust library — API, 7 stream types, architecture, error codes |
 | [**autorip**](https://github.com/freemkv/autorip) | Automatic ripper — Docker, web UI, TMDB, webhooks. [ghcr.io](https://ghcr.io/freemkv/autorip) |
 | [**freemkv-engine**](https://github.com/freemkv/freemkv-engine) | Shared rip-orchestration layer between libfreemkv and the front ends (recovery strategy, multi-title rip loop) |
 | [**bdemu**](https://github.com/freemkv/bdemu) | Drive emulator — develop and test without real hardware |
@@ -161,5 +161,5 @@ Captures your drive's hardware profile and submits it as a GitHub issue. No disc
   <a href="https://github.com/freemkv/libfreemkv">Library</a> ·
   <a href="https://github.com/freemkv/autorip">Autorip</a> ·
   <a href="https://github.com/freemkv/bdemu">Emulator</a> ·
-  <a href="https://www.gnu.org/licenses/agpl-3.0.txt">AGPL-3.0</a>
+  <a href="https://github.com/freemkv/freemkv/blob/main/LICENSE">MIT</a>
 </p>
