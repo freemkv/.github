@@ -18,8 +18,8 @@ Stream labels extracted automatically — audio purpose, codec detail, forced su
 
 **macOS — Homebrew:**
 ```bash
-brew install freemkv/tap/freemkv          # command line
-brew install --cask freemkv/tap/freemkv   # desktop app
+brew install freemkv/tap/freemkv             # command line
+brew install --cask freemkv/tap/freemkv-app  # desktop app
 ```
 
 **Linux:**
