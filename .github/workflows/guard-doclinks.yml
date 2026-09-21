@@ -1,0 +1,62 @@
+name: guard-doclinks
+
+# Reusable doc-links gate: fails on broken intra-doc links in ///|//! comments
+# (`cargo doc -D broken_intra_doc_links`). Unlike the old per-repo copies this
+# (a) resolves the toolchain from the caller's rust-version (no hardcoded pin to
+# drift) and (b) checks out siblings via the shared composite action so the doc
+# build resolves path-deps against the tips under test, not stale git tags.
+# Callers: `uses: freemkv/.github/.github/workflows/guard-doclinks.yml@v1` with
+# `self`, and (for non-leaf crates) `checkout` / `patch`.
+
+on:
+  workflow_call:
+    inputs:
+      self:
+        description: Caller repo dir name (crate to document).
+        required: true
+        type: string
+      checkout:
+        description: Space-separated sibling repos to check out (empty for a leaf crate).
+        required: false
+        type: string
+        default: ""
+      patch:
+        description: Space-separated crate names to patch into .cargo/config.toml.
+        required: false
+        type: string
+        default: ""
+      doc-args:
+        description: Arguments to `cargo doc`.
+        required: false
+        type: string
+        default: "--no-deps --document-private-items --lib --bins"
+
+jobs:
+  doc-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ inputs.self }}
+      - uses: freemkv/.github/.github/actions/checkout-siblings@v1
+        if: inputs.checkout != ''
+        with:
+          checkout: ${{ inputs.checkout }}
+          patch: ${{ inputs.patch }}
+          self: ${{ inputs.self }}
+      - name: Resolve toolchain from rust-version
+        id: msrv
+        run: |
+          v=$(grep -m1 -E '^[[:space:]]*rust-version[[:space:]]*=' "${{ inputs.self }}/Cargo.toml" | sed -E 's/.*"([0-9.]+)".*/\1/')
+          echo "v=${v:-stable}" >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.msrv.outputs.v }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ inputs.self }}
+      - name: cargo doc (deny broken intra-doc links)
+        working-directory: ${{ inputs.self }}
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::broken_intra_doc_links"
+        run: cargo doc ${{ inputs.doc-args }}

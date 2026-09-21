@@ -1,0 +1,23 @@
+name: guard-comment
+
+# Reusable comment-guard: caps explanatory prose by COMMENT INTENT (not
+# visibility). //!//*! module docs unbounded; ///, /** */ item docs 8 prose
+# lines (fenced ``` excluded); //, /* */ asides 3 lines (single-blank runs count
+# cumulatively). The canonical script + its selftest live here (ci/comment-guard.py)
+# so all repos share ONE definition. Callers: `uses: freemkv/.github/.github/workflows/guard-comment.yml@v1`.
+
+on:
+  workflow_call:
+
+jobs:
+  comment-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: freemkv/.github
+          ref: v1
+          path: .guard
+      - name: Run comment-guard
+        run: python3 .guard/ci/comment-guard.py

@@ -1,0 +1,40 @@
+name: guard-leak
+
+# Reusable public-repo leak gate: internal-infra references, tracked
+# CLAUDE.md/.claude paths, and AI-attribution in commit messages. The canonical
+# script lives here (ci/leak-guard.sh) so every repo shares ONE net.
+# Callers: `uses: freemkv/.github/.github/workflows/guard-leak.yml@v1`.
+
+on:
+  workflow_call:
+
+jobs:
+  leak-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v5
+        with:
+          repository: freemkv/.github
+          ref: v1
+          path: .guard
+      - name: Compute commit range
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            echo "range=$PR_BASE..$PR_HEAD" >> "$GITHUB_OUTPUT"
+          elif [ -z "${BEFORE:-}" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "range=$AFTER" >> "$GITHUB_OUTPUT"
+          else
+            echo "range=$BEFORE..$AFTER" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run leak-guard
+        run: bash .guard/ci/leak-guard.sh "${{ steps.range.outputs.range }}"
