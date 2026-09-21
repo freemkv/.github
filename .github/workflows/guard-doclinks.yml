@@ -59,4 +59,9 @@ jobs:
         working-directory: ${{ inputs.self }}
         env:
           RUSTDOCFLAGS: "-D rustdoc::broken_intra_doc_links"
-        run: cargo doc ${{ inputs.doc-args }}
+        # Drop any cached target/doc first: rust-cache can restore a partial
+        # doc tree that `cargo doc` then fails to remove ("failed to remove
+        # directory target/doc/<crate>"). A fresh doc build sidesteps the race.
+        run: |
+          rm -rf target/doc || true
+          cargo doc ${{ inputs.doc-args }}
