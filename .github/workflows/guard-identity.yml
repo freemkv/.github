@@ -23,9 +23,10 @@ jobs:
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          # Unrelated business domains + a personal address normalized to the
-          # GitHub noreply. Real external contributors are unaffected.
-          BANNED='@example-a\.invalid|@example-b\.invalid|owner@example\.invalid'
+          # sha256 of banned "@domain"s and full addresses, never the plain text:
+          # this file is public. Real external contributors are unaffected.
+          BANNED_SHA="553fff72ac907c1a6d4e9034f115221ecf0b05cf45ee5b757caa7541573668f8 a02674d1cb6f293e6886a609d463e8c1747a545e52def67dbdf52b214c8f74f0 7299f3b8dac44ef6412eff29a0f36866f1470d446551e421aa74967171d1296e"
+          h() { printf '%s' "$1" | sha256sum | cut -d' ' -f1; }
           if [ "$EVENT" = "pull_request" ]; then
             range="$PR_BASE..$PR_HEAD"
           elif [ -n "${BEFORE:-}" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$BEFORE" 2>/dev/null; then
@@ -33,9 +34,15 @@ jobs:
           else
             range="$AFTER~1..$AFTER"
           fi
-          bad=$(git log --format='%an <%ae>%n%cn <%ce>' "$range" 2>/dev/null | sort -u | grep -iE "$BANNED" || true)
+          bad=""
+          while read -r sha email; do
+            e=$(printf '%s' "$email" | tr 'A-Z' 'a-z')
+            for x in "$(h "$e")" "$(h "@${e#*@}")"; do
+              case " $BANNED_SHA " in *" $x "*) bad="$bad $sha";; esac
+            done
+          done < <(git log --format='%h %ae%n%h %ce' "$range" 2>/dev/null | sort -u)
           if [ -n "$bad" ]; then
-            echo "::error::commit(s) carry a banned author/committer identity:"; echo "$bad" | sed 's/^/  /'
+            echo "::error::commit(s) carry a banned author/committer identity:$(printf '%s\n' $bad | sort -u | tr '\n' ' ')"
             echo "::error::Commit as your GitHub noreply (1085847+MattJackson@users.noreply.github.com). Fix: git config user.email <noreply>; git commit --amend --reset-author."
             exit 1
           fi
