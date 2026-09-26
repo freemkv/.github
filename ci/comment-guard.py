@@ -1,27 +1,10 @@
 #!/usr/bin/env python3
-"""comment-guard: cap explanatory prose by COMMENT INTENT, not visibility.
+"""Check concise Rust comments and reject root docs/ overflow.
 
-Three tiers, keyed on the syntax the author reached for:
-
-  * `//!` / `/*!` — a module (or crate) design doc. UNBOUNDED. There is one per
-    file, at the top, documenting the module as a whole, so it can't be used to
-    smuggle per-item rationale the way item docs can. Long correctness / design
-    essays (e.g. a memory-ordering proof) legitimately live here.
-  * `///` / `/** */` — item documentation. Up to DOC_CAP *prose* lines. Fenced
-    ``` code blocks do NOT count, so real examples aren't punished. This holds
-    whether or not the item is `pub`: a `pub(crate)` fn deserves a real doc
-    paragraph just like a `pub` one. Capping `///` here (rather than exempting
-    it, as the old guard did — issue #17) is what stops rationale being hidden
-    behind a doc sigil, while still leaving room for a genuine paragraph.
-  * `//` / `/* */` — a quick internal aside. Up to INLINE_CAP lines. This is the
-    shape that sprawls into walls, so it's kept tight: stanzas separated by a
-    single blank line count CUMULATIVELY, so one essay can't be split into runs.
-
-Overflow belongs in the module `//!`, or in docs/<topic>.md with a one-line `//`
-pointer — both show up in review.
-
-Scans src/ and tests/ under the given root (default cwd). `--selftest` runs
-built-in cases. Exit non-zero if any block exceeds its cap.
+Comments explain current contracts, constraints and non-obvious decisions.
+Delete narration, repetition and change history instead of relocating them.
+Use Rustdoc for API contracts, README for usage, and CHANGELOG for releases.
+Fenced examples do not count toward Rustdoc prose limits.
 """
 import re
 import sys
@@ -29,6 +12,7 @@ from pathlib import Path
 
 INLINE_CAP = 3
 DOC_CAP = 8
+MODULE_CAP = 16
 
 _RAW_OPEN = re.compile(r'r(#*)"')  # raw string opener: r"…", r#"…"#, br##"…"## …
 _CHAR_LIT = re.compile(r"'(?:\\.|[^'\\\n])'")  # a Rust char literal (not a lifetime)
@@ -168,9 +152,7 @@ def violations(path):
 
         start = i
         if rec["is_doc"]:
-            # Doc run: contiguous doc lines. `//!` / `/*!` module docs are
-            # UNBOUNDED; any other doc run caps PROSE (fenced ``` excluded) at
-            # DOC_CAP, regardless of the documented item's visibility.
+            # Fenced examples are excluded; module prose has a finite cap too.
             j = i
             prose = 0
             in_fence = False
@@ -187,8 +169,9 @@ def violations(path):
                 elif not in_fence and body.strip() != "":
                     prose += 1
                 j += 1
-            if not module_doc and prose > DOC_CAP:
-                out.append((start + 1, prose, DOC_CAP, "doc prose"))
+            cap = MODULE_CAP if module_doc else DOC_CAP
+            if prose > cap:
+                out.append((start + 1, prose, cap, "module prose" if module_doc else "doc prose"))
             i = j
             continue
 
@@ -222,18 +205,25 @@ def main(argv):
     root = Path(argv[1]) if len(argv) > 1 else Path.cwd()
     files = sorted(p for d in ("src", "tests") for p in (root / d).rglob("*.rs"))
     total = 0
+    if (root / "docs").exists() or (root / "docs").is_symlink():
+        print("docs/: remove comment-overflow documentation; preserve essential API contracts in Rustdoc and usage in README.")
+        total += 1
     for f in files:
+        for number, rec in enumerate(_classify(f.read_text().splitlines()), 1):
+            if rec["comment"] and re.search(r"(?<![\w/])(?:\./)?docs/[\w.-]+", rec["raw"]):
+                print(f"{f.relative_to(root)}:{number}: stale local-doc pointer; keep the useful constraint here or delete it.")
+                total += 1
         for start, length, cap, kind in violations(f):
             rel = f.relative_to(root)
             print(f"{rel}:{start}: {kind} block is {length} lines (max {cap})")
             total += 1
     if total:
-        print(f"\ncomment-guard: {total} comment block(s) exceed their cap.")
+        print(f"\ncomment-guard: {total} violation(s).")
         print(
             f"Inline // asides cap at {INLINE_CAP}; /// item-doc prose caps at "
-            f"{DOC_CAP} (fenced examples excluded); //! module docs are unbounded. "
-            "Trim, move the rationale into the module //!, or docs/<topic>.md "
-            "with a // pointer."
+            f"{DOC_CAP}; //! module prose caps at {MODULE_CAP} (fenced examples excluded). "
+            "Delete repetition, code narration and change history. Keep only current "
+            "contracts and non-obvious constraints; do not relocate overflow."
         )
         return 1
     return 0
@@ -322,10 +312,13 @@ def _selftest():
             + '</x>"#;\nfn b() {}\n',
             0,
         ),
-        # //! module doc may run long -> EXEMPT (no cap)
-        ("".join(f"//! l{k}\n" for k in range(40)) + "\npub fn m() {}\n", 0),
-        # /*! block module doc may run long -> EXEMPT
-        ("/*! l0\n" + "".join(f" l{k}\n" for k in range(30)) + "*/\nfn n() {}\n", 0),
+        ("".join(f"//! line {k}\n" for k in range(MODULE_CAP)), 0),
+        ("".join(f"//! line {k}\n" for k in range(MODULE_CAP + 1)), 1),
+        ("//! Summary.\n//! ```rust\n" + "//! example();\n" * 30 + "//! ```\n", 0),
+        # Module docs are bounded as well.
+        ("".join(f"//! l{k}\n" for k in range(40)) + "\npub fn m() {}\n", 1),
+        # Block module docs have the same cap.
+        ("/*! l0\n" + "".join(f" l{k}\n" for k in range(30)) + "*/\nfn n() {}\n", 1),
     ]
     ok = True
     with tempfile.TemporaryDirectory() as d:
@@ -337,6 +330,28 @@ def _selftest():
             if got != want:
                 ok = False
             print(f"  selftest {idx}: want {want} got {got} [{flag}]")
+        import contextlib
+        import io
+        root = Path(d) / "repo"
+        (root / "src").mkdir(parents=True)
+        sample = root / "src/lib.rs"
+        for source, has_docs, want in [
+            ("//! Short module.\n", False, 0),
+            ("//! Short module.\n", True, 1),
+            ("// See docs/old.md\nfn f() {}\n", False, 1),
+            ('const S: &str = r#"\n// See docs/example.md\n"#;\n', False, 0),
+            ("//! https://example.org/docs/api\n", False, 0),
+        ]:
+            sample.write_text(source)
+            if has_docs:
+                (root / "docs").mkdir()
+            elif (root / "docs").exists():
+                (root / "docs").rmdir()
+            with contextlib.redirect_stdout(io.StringIO()):
+                got = main(["comment-guard.py", str(root)])
+            if got != want:
+                ok = False
+                print(f"repository selftest failed: {source!r}, docs={has_docs}, want={want}, got={got}")
     print("selftest PASSED" if ok else "selftest FAILED")
     return 0 if ok else 1
 

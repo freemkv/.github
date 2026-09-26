@@ -1,0 +1,10 @@
+name: Comment guard self-tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: python3 ci/comment-guard.py --selftest
