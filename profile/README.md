@@ -6,7 +6,7 @@
 
 # freemkv
 
-Open source 4K UHD / Blu-ray / DVD backup. One binary, no dependencies. Plug in your drive, rip to MKV.
+Open source 4K UHD / Blu-ray / DVD backup. Plug in your drive, rip to MKV. Get the **freemkv** app (desktop window plus every command) or **freemkv CLI** (command line only, no dependencies) — install one or the other.
 
 Stream labels extracted automatically — audio purpose, codec detail, forced subtitles, language variants — metadata other tools miss. Bundled drive profiles. 17+ MB/s sustained.
 
@@ -16,30 +16,22 @@ Stream labels extracted automatically — audio purpose, codec detail, forced su
 
 ### 1. Install
 
-**macOS — Homebrew:**
-```bash
-brew install freemkv/tap/freemkv             # command line
-brew install --cask freemkv/tap/freemkv-app  # desktop app
-```
+| | freemkv (app) | freemkv CLI |
+|---|---|---|
+| **Windows** | [Installer](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-windows-setup.exe) · [portable zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-windows.zip) | [freemkv-cli-x86_64-windows.exe](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-cli-x86_64-windows.exe) |
+| **macOS** | `brew install --cask freemkv/tap/freemkv` | `brew install freemkv/tap/freemkv-cli` |
+| **Linux** | [freemkv-amd64.deb](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-amd64.deb) · [AppImage](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-linux.AppImage) · [Flatpak](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-linux.flatpak) | [freemkv-cli-amd64.deb](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-cli-amd64.deb) · static `freemkv-cli-x86_64-linux` / `freemkv-cli-aarch64-linux` |
 
-**Linux:**
+Both install the `freemkv` command. In the app, bare `freemkv` opens the window and
+any arguments run the CLI. The Windows installer adds `freemkv` to your PATH.
+
+**CLI without a package manager** (Linux shown; macOS: `freemkv-cli-aarch64-macos` / `freemkv-cli-x86_64-macos`):
 ```bash
-curl -sLo freemkv https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-linux
+curl -sLo freemkv https://github.com/freemkv/freemkv/releases/latest/download/freemkv-cli-x86_64-linux
 chmod +x freemkv && sudo mv freemkv /usr/local/bin/
 ```
-Use `freemkv-aarch64-linux` on arm64.
 
-**macOS — direct download:**
-```bash
-curl -sLo freemkv https://github.com/freemkv/freemkv/releases/latest/download/freemkv-aarch64-macos
-chmod +x freemkv && sudo mv freemkv /usr/local/bin/
-```
-Use `freemkv-x86_64-macos` on Intel. Fetching with `curl` avoids the macOS
-security prompt a browser download gets; Homebrew does too.
-
-**Windows:** Download [freemkv-x86_64-windows.zip](https://github.com/freemkv/freemkv/releases/latest/download/freemkv-x86_64-windows.zip), extract, run from Command Prompt.
-
-[All downloads](https://github.com/freemkv/freemkv/releases)
+[All downloads](https://freemkv.org/download)
 
 ### 2. Set up decryption keys (one time)
 
