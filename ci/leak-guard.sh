@@ -68,21 +68,22 @@ done < <(git ls-files)
 # an argument (not interpolated into a //) so metacharacters like the "/" in a
 # path-style token can't break the regex. Reads raw bytes so non-UTF-8 blobs
 # don't abort the scan.
-# A non-empty third argument skips *_RE='...' pattern-definition lines.
+# A non-empty third argument skips the exact INFRA_RE definition line, the
+# only one that self-matches; any trailing content on it is still scanned.
 pcre_matches() {
   perl -e '
     my ($file, $re, $skip) = @ARGV;
     open(my $fh, "<:raw", $file) or exit 0;
     my $rx; eval { $rx = qr/$re/i }; exit 0 if $@;
     while (my $l = <$fh>) {
-      next if $skip && $l =~ /^[A-Z_]+_RE=\x27/;
+      next if $skip && $l =~ /^INFRA_RE=\x27[^\x27]*\x27$/;
       if ($l =~ /$rx/) { print "$.: $&\n"; }
     }
   ' "$1" "$2" "${3:-}" 2>/dev/null
 }
 
-# In this script's own repo, skip only its pattern-definition lines (they must
-# self-match); the rest of the file is scanned. Empty when run from elsewhere.
+# In this script's own repo, skip only its INFRA_RE line (it must self-match);
+# the rest of the file is scanned. Empty when run from elsewhere.
 SELF="$( { git ls-files --full-name -- "$SELF_ABS" 2>/dev/null || true; } | head -1)"
 
 echo "── leak-guard: internal-infra references in tracked files ──"

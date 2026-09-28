@@ -8,6 +8,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 # Built from pieces so this file does not itself trip the home-path net.
 HOME_LEAK="/Us""ers/alice/Developer/x"
+IP_LEAK="10.1"".2.3"
 failed=0
 
 mkrepo() {
@@ -42,6 +43,18 @@ mkrepo selfleak
 mkdir -p "$TMP/selfleak/ci" && cp "$GUARD" "$TMP/selfleak/ci/"
 printf '# built on %s\n' "$HOME_LEAK" >> "$TMP/selfleak/ci/leak-guard.sh"
 expect "leak inside the guard script itself" selfleak "$TMP/selfleak/ci/leak-guard.sh" 1 "ci/leak-guard.sh"
+
+# Only the exact INFRA_RE line is exempt; other *_RE= lines and trailers are scanned.
+mkrepo bogusre
+mkdir -p "$TMP/bogusre/ci" && cp "$GUARD" "$TMP/bogusre/ci/"
+printf "BOGUS_RE='%s'\n" "$HOME_LEAK" >> "$TMP/bogusre/ci/leak-guard.sh"
+expect "leak on a bogus *_RE= line" bogusre "$TMP/bogusre/ci/leak-guard.sh" 1 "ci/leak-guard.sh"
+
+mkrepo trailer
+mkdir -p "$TMP/trailer/ci" && cp "$GUARD" "$TMP/trailer/ci/"
+IP_LEAK="$IP_LEAK" perl -i -pe 's/^(INFRA_RE=\x27[^\x27]*\x27)$/$1 # db at $ENV{IP_LEAK}/' "$TMP/trailer/ci/leak-guard.sh"
+grep -qF "# db at $IP_LEAK" "$TMP/trailer/ci/leak-guard.sh" || { echo "FAIL trailer setup"; failed=1; }
+expect "leak trailing the INFRA_RE line" trailer "$TMP/trailer/ci/leak-guard.sh" 1 "ci/leak-guard.sh"
 
 [ "$failed" -eq 0 ] && echo "leak-guard selftest: all passed"
 exit "$failed"
