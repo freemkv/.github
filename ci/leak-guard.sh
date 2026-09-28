@@ -22,8 +22,8 @@
 
 set -euo pipefail
 
-# Absolute path to this script, resolved before any cd, so we can exclude it
-# from the content scan (it necessarily contains the detection patterns).
+# Absolute path to this script, resolved before any cd, so its own pattern
+# definitions can be skipped in the content scan.
 SELF_ABS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 REPO="$(git rev-parse --show-toplevel)"
@@ -36,8 +36,8 @@ note() { printf '  ✗ %s\n' "$1"; fail=1; }
 # the patterns themselves must not name any org-specific identifier (doing so
 # would itself leak the infra they guard). We catch the leak *class*:
 #   - RFC1918 private IPv4 ranges (10/8, 172.16/12, 192.168/16),
-#   - private/internal/non-routable TLDs (.internal/.local/.lan/.corp/.invalid),
-#   - docker.internal.
+#   - private/non-routable TLDs (internal, local, lan, corp, invalid),
+#   - the docker-internal host name.
 # The full org-specific net (literal hostnames, service names, repo paths,
 # vendor tooling, …) lives ONLY in the private scanner and never ships here.
 INFRA_RE='\b10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|\b172\.(1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3}|\b192\.168\.[0-9]{1,3}\.[0-9]{1,3}|\.internal\b|\.local\b|\.lan\b|\.corp\b|\.invalid\b|docker\.internal'
@@ -45,7 +45,7 @@ INFRA_RE='\b10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|\b172\.(1[6-9]|2[0-9]|3[01])\
 # committed into a tracked file (a macOS /Users/<user>/… or Linux /home/<user>/…
 # path). This names NO specific user — it matches the leak *class* (any home
 # path), so the pattern itself reveals nothing org- or person-specific. A real
-# leak (e.g. /Users/alice/Developer/x slipping into a public RELEASE.md) trips
+# leak (e.g. a /Users/<name>/Developer path slipping into a RELEASE.md) trips
 # this regardless of whose machine it came from. The username segment is a
 # literal-username class ([A-Za-z0-9._-]) so dynamic/templated paths that build
 # the user at runtime — shell `/home/$USER/`, doc `/home/<rip>/`, Rust
@@ -68,32 +68,36 @@ done < <(git ls-files)
 # an argument (not interpolated into a //) so metacharacters like the "/" in a
 # path-style token can't break the regex. Reads raw bytes so non-UTF-8 blobs
 # don't abort the scan.
+# A non-empty third argument skips *_RE='...' pattern-definition lines.
 pcre_matches() {
   perl -e '
-    my ($file, $re) = @ARGV;
+    my ($file, $re, $skip) = @ARGV;
     open(my $fh, "<:raw", $file) or exit 0;
     my $rx; eval { $rx = qr/$re/i }; exit 0 if $@;
-    while (my $l = <$fh>) { if ($l =~ /$rx/) { print "$.: $&\n"; } }
-  ' "$1" "$2" 2>/dev/null
+    while (my $l = <$fh>) {
+      next if $skip && $l =~ /^[A-Z_]+_RE=\x27/;
+      if ($l =~ /$rx/) { print "$.: $&\n"; }
+    }
+  ' "$1" "$2" "${3:-}" 2>/dev/null
 }
 
-# This script's own source necessarily contains the detection patterns (e.g.
-# the regex tokens in INFRA_RE), so scanning it would always self-flag. Skip it.
-SELF="$(git ls-files --full-name -- "$SELF_ABS" 2>/dev/null | head -1)"
+# In this script's own repo, skip only its pattern-definition lines (they must
+# self-match); the rest of the file is scanned. Empty when run from elsewhere.
+SELF="$( { git ls-files --full-name -- "$SELF_ABS" 2>/dev/null || true; } | head -1)"
 
 echo "── leak-guard: internal-infra references in tracked files ──"
 while IFS= read -r f; do
   case "$f" in *.png|*.jpg|*.jpeg|*.ico|*.gif|*.bin|*.crate|*.gz|*.zip|*.pdf) continue ;; esac
-  [ -n "$SELF" ] && [ "$f" = "$SELF" ] && continue
   [ -f "$f" ] || continue
+  self=""; [ -n "$SELF" ] && [ "$f" = "$SELF" ] && self=1
   while IFS= read -r hit; do
     [ -z "$hit" ] && continue
     note "internal-infra reference: $f:$hit"
-  done < <(pcre_matches "$f" "$INFRA_RE")
+  done < <(pcre_matches "$f" "$INFRA_RE" "$self")
   while IFS= read -r hit; do
     [ -z "$hit" ] && continue
     note "[HOME-PATH] absolute home path: $f:$hit (no local home path may be committed to a public repo)"
-  done < <(pcre_matches "$f" "$HOMEPATH_RE")
+  done < <(pcre_matches "$f" "$HOMEPATH_RE" "$self")
 done < <(git ls-files)
 
 RANGE="${1:-}"
