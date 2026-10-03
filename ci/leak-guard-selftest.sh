@@ -56,5 +56,31 @@ IP_LEAK="$IP_LEAK" perl -i -pe 's/^(INFRA_RE=\x27[^\x27]*\x27)$/$1 # db at $ENV{
 grep -qF "# db at $IP_LEAK" "$TMP/trailer/ci/leak-guard.sh" || { echo "FAIL trailer setup"; failed=1; }
 expect "leak trailing the INFRA_RE line" trailer "$TMP/trailer/ci/leak-guard.sh" 1 "ci/leak-guard.sh"
 
+
+# commit-message attribution: only dependabot's exact bot trailer is allowed through.
+DEP_TRAILER='Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
+mkcommit() {  # <repo> <message>
+  mkrepo "$1"
+  git -C "$TMP/$1" -c user.name="Matthew Jackson" -c user.email="1085847+MattJackson@users.noreply.github.com" add -A
+  git -C "$TMP/$1" -c user.name="Matthew Jackson" -c user.email="1085847+MattJackson@users.noreply.github.com" commit -q -m "base"
+  printf 'x\n' >> "$TMP/$1/README.md"
+  git -C "$TMP/$1" -c user.name="Matthew Jackson" -c user.email="1085847+MattJackson@users.noreply.github.com" commit -q -am "$2"
+}
+expect_range() {  # <name> <repo> <want-exit> <want-fragment>
+  local out code
+  out="$(cd "$TMP/$2" && bash "$GUARD" HEAD~1..HEAD 2>&1)"; code=$?
+  if [ "$code" -ne "$3" ] || ! grep -qF -- "$4" <<<"$out"; then
+    printf 'FAIL %s: exit %s (want %s), want "%s"\n%s\n' "$1" "$code" "$3" "$4" "$out"; failed=1
+  else printf 'ok   %s\n' "$1"; fi
+}
+mkcommit depok "$(printf 'bump a dependency\n\n%s' "$DEP_TRAILER")"
+expect_range "dependabot's own trailer is allowed" depok 0 "leak-guard: clean"
+mkcommit depfake "$(printf 'bump\n\nCo-authored-by: dependabot[bot] <someone@example.org>')"
+expect_range "a lookalike dependabot trailer is still flagged" depfake 1 "message contains"
+mkcommit aibad "$(printf 'change\n\nCo-authored-by: Some Assistant <noreply@example.org>')"
+expect_range "any other co-author trailer is still flagged" aibad 1 "message contains"
+mkcommit depmix "$(printf 'bump\n\n%s\nCo-authored-by: Some Assistant <noreply@example.org>' "$DEP_TRAILER")"
+expect_range "dependabot's trailer does not hide another one" depmix 1 "message contains"
+
 [ "$failed" -eq 0 ] && echo "leak-guard selftest: all passed"
 exit "$failed"

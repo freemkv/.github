@@ -107,6 +107,9 @@ if [ -n "$RANGE" ]; then
   while IFS= read -r sha; do
     [ -z "$sha" ] && continue
     msg="$(git log -1 --format='%B' "$sha" 2>/dev/null || true)"
+    # Dependabot adds its own bot trailer to every commit it opens; that exact line is
+    # not AI attribution. Any other trailer, even a lookalike bot, is still scanned.
+    msg="$(printf '%s\n' "$msg" | grep -viE '^co-authored-by: dependabot\[bot\] <[0-9]+\+dependabot\[bot\]@users\.noreply\.github\.com>[[:space:]]*$' || true)"
     # Pass the pattern as an argument (not interpolated into a //) so the
     # lookbehind char class and "/" don't break the regex.
     hit="$(printf '%s' "$msg" | perl -e '
