@@ -54,7 +54,7 @@ HOMEPATH_RE='/Users/[A-Za-z0-9._-]+/|/home/[A-Za-z0-9._-]+/'
 # AI-attribution net (case-insensitive). "claude" matches only as a standalone
 # word — NOT preceded by a dot/slash/alnum and NOT followed by .md — so legit
 # mentions of CLAUDE.md / .claude/ in a commit message don't false-positive.
-ATTR_RE='co-authored-by|generated with|🤖|(?<![.\/A-Za-z0-9])claude(?!\.md)'
+ATTR_RE='co-authored-by|\bgenerated with|🤖|(?<![.\/A-Za-z0-9])claude(?!\.md)'
 
 echo "── leak-guard: tracked agent-context paths ──"
 while IFS= read -r f; do

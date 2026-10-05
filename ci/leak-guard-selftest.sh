@@ -82,5 +82,12 @@ expect_range "any other co-author trailer is still flagged" aibad 1 "message con
 mkcommit depmix "$(printf 'bump\n\n%s\nCo-authored-by: Some Assistant <noreply@example.org>' "$DEP_TRAILER")"
 expect_range "dependabot's trailer does not hide another one" depmix 1 "message contains"
 
+mkcommit regenerated "Regenerated with that override disabled so the lock resolves upstream."
+expect_range "regeneration prose is not attribution" regenerated 0 "leak-guard: clean"
+mkcommit generated "Generated with an assistant"
+expect_range "standalone generation attribution remains blocked" generated 1 "message contains"
+mkcommit generated_lower "change: generated with an assistant"
+expect_range "inline generation attribution remains blocked" generated_lower 1 "message contains"
+
 [ "$failed" -eq 0 ] && echo "leak-guard selftest: all passed"
 exit "$failed"
