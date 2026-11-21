@@ -25,6 +25,7 @@ set -euo pipefail
 # Absolute path to this script, resolved before any cd, so its own pattern
 # definitions can be skipped in the content scan.
 SELF_ABS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+HUMANS="$(dirname "$SELF_ABS")/human-coauthors.txt"
 
 REPO="$(git rev-parse --show-toplevel)"
 cd "$REPO"
@@ -110,6 +111,11 @@ if [ -n "$RANGE" ]; then
     # Dependabot adds its own bot trailer to every commit it opens; that exact line is
     # not AI attribution. Any other trailer, even a lookalike bot, is still scanned.
     msg="$(printf '%s\n' "$msg" | grep -viE '^co-authored-by: dependabot\[bot\] <[0-9]+\+dependabot\[bot\]@users\.noreply\.github\.com>[[:space:]]*$' || true)"
+    # Human contributors credited by the owner: exact trailer lines listed in
+    # human-coauthors.txt beside this script. Every other co-author line still fails.
+    if [ -s "$HUMANS" ]; then
+      msg="$(printf '%s\n' "$msg" | grep -vxF -f "$HUMANS" || true)"
+    fi
     # Pass the pattern as an argument (not interpolated into a //) so the
     # lookbehind char class and "/" don't break the regex.
     hit="$(printf '%s' "$msg" | perl -e '
